@@ -78,14 +78,7 @@ export function appendImagesToGallery(images) {
   refreshLightbox();
 }
 
-export function scrollPage() {
-  const el = gallery.lastElementChild;
-  const height = el.getBoundingClientRect().height;
-  window.scrollBy({
-    top: height * 2,
-    behavior: "smooth",
-  });
-}
+
 
 export function clearGallery(gallery) {
     gallery.innerHTML = "";
