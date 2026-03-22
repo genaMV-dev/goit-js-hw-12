@@ -1,6 +1,6 @@
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
-import { createGallery, clearGallery, hideLoader, showLoader, hideLoadMoreBtn, showLoadMoreBtn, refreshLightbox, scrollPage, addImagesToGallery } from "./js/render-functions";
+import { createGallery, clearGallery, hideLoader, showLoader, hideLoadMoreBtn, showLoadMoreBtn, refreshLightbox, addImagesToGallery } from "./js/render-functions";
 import { getImagesByQuery} from "./js/pixabay-api";
 
 const form = document.querySelector(".form");
@@ -10,10 +10,19 @@ const loadMoreBtn = document.querySelector(".load-more-btn");
 let query;
 let page = 1;
 
+function scrollPage() {
+  const el = gallery.lastElementChild;
+  const height = el.getBoundingClientRect().height;
+  window.scrollBy({
+    top: height * 2.4,
+    behavior: "smooth",
+  });
+}
+
 async function handleSearch(query) {
   try {
     hideLoadMoreBtn();
-    const data = await getImagesByQuery(query, 1);
+    const data = await getImagesByQuery(query, page);
 
     if (data.hits.length === 0) {
       iziToast.show({
@@ -30,6 +39,10 @@ async function handleSearch(query) {
         showLoadMoreBtn();
     }else{
         hideLoadMoreBtn();
+        iziToast.show({
+                message: "We're sorry, but you've reached the end of search results.",
+                color: "blue",
+            });
     }
 
   } catch (err) {
@@ -46,7 +59,7 @@ async function handleSearch(query) {
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
-
+  page = 1;
   const formData = new FormData(form);
   query = formData.get("search-text");
 
@@ -64,7 +77,7 @@ form.addEventListener("submit", (e) => {
 loadMoreBtn.addEventListener("click", async (e) => {
     showLoader(gallery);
     page++;
-
+    hideLoadMoreBtn();
     try {
         const data = await addImagesToGallery(query, page);
         scrollPage();
@@ -86,6 +99,7 @@ loadMoreBtn.addEventListener("click", async (e) => {
     } finally {
         hideLoader(gallery);
     }
+    showLoadMoreBtn();
 });
     
     

@@ -108,11 +108,3 @@ export function hideLoadMoreBtn() {
   loadMoreBtn.classList.remove(`is-active`);
 }
 
-export function scrollPage() {
-  const el = gallery.lastElementChild;
-  const height = el.getBoundingClientRect().height;
-  window.scrollBy({
-    top: height * 2.4,
-    behavior: "smooth",
-  });
-}
