@@ -2,11 +2,10 @@
 import SimpleLightbox from "simplelightbox";
 // Додатковий імпорт стилів
 import "simplelightbox/dist/simple-lightbox.min.css";
+import { getImagesByQuery } from "./pixabay-api";
 
-const loader = document.querySelector(".loader");
 const loadMoreBtn = document.querySelector(".load-more-btn");
 const gallery = document.querySelector(".gallery");
-
 
 let lightboxInstance = null;
 
@@ -74,20 +73,30 @@ export function createGallery(images){
     }
 }
 
+export async function addImagesToGallery(query, page) {
+  const data = await getImagesByQuery(query, page);
+  const markup = imagesTemplate(data.hits);
+  gallery.insertAdjacentHTML("beforeend", markup);
+  return data;
+}
+
 export function clearGallery(gallery) {
     gallery.innerHTML = "";
 }
 
-export function showLoader(gallery) {
-  loader.textContent = "Loading";
-  loader.classList.add("loader");
-  gallery.appendChild(loader);
+export function showLoader(targetGallery = gallery) {
+  if (targetGallery.querySelector(".loader")) return;
+
+  const loaderElem = document.createElement("span");
+  loaderElem.className = "loader";
+  loaderElem.textContent = "Loading";
+  targetGallery.appendChild(loaderElem);
 }
 
-export function hideLoader(gallery) {
-  const loader = gallery.querySelector(".loader");
-  if (loader) {
-    loader.remove();
+export function hideLoader(targetGallery = gallery) {
+  const loaderElem = targetGallery.querySelector(".loader");
+  if (loaderElem) {
+    loaderElem.remove();
   }
 }
 
@@ -103,7 +112,7 @@ export function scrollPage() {
   const el = gallery.lastElementChild;
   const height = el.getBoundingClientRect().height;
   window.scrollBy({
-    top: height * 2,
+    top: height * 2.4,
     behavior: "smooth",
   });
 }

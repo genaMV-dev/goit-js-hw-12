@@ -1,6 +1,6 @@
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
-import { createGallery, clearGallery, hideLoader, showLoader, hideLoadMoreBtn, showLoadMoreBtn, imagesTemplate, refreshLightbox, scrollPage } from "./js/render-functions";
+import { createGallery, clearGallery, hideLoader, showLoader, hideLoadMoreBtn, showLoadMoreBtn, refreshLightbox, scrollPage, addImagesToGallery } from "./js/render-functions";
 import { getImagesByQuery} from "./js/pixabay-api";
 
 const form = document.querySelector(".form");
@@ -64,21 +64,28 @@ form.addEventListener("submit", (e) => {
 loadMoreBtn.addEventListener("click", async (e) => {
     showLoader(gallery);
     page++;
-    const data = await getImagesByQuery(query, page);
-    const markup = imagesTemplate(data.hits);
-    gallery.insertAdjacentHTML("beforeend", markup);
-    scrollPage();
-    refreshLightbox();
 
-    if (page * 15 >= data.totalHits) {
-        hideLoadMoreBtn();
+    try {
+        const data = await addImagesToGallery(query, page);
+        scrollPage();
+        refreshLightbox();
+
+        if (page * 15 >= data.totalHits) {
+            hideLoadMoreBtn();
+            iziToast.show({
+                message: "We're sorry, but you've reached the end of search results.",
+                color: "blue",
+            });
+        }
+    } catch (err) {
         iziToast.show({
-            message: "We're sorry, but you've reached the end of search results.",
-            color: "blue",
+            title: "Error",
+            message: "Something went wrong while loading more images. Please try again.",
+            color: "red",
         });
+    } finally {
+        hideLoader(gallery);
     }
-
-    hideLoader(gallery);
 });
     
     
