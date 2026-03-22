@@ -77,6 +77,11 @@ export async function addImagesToGallery(query, page) {
   const data = await getImagesByQuery(query, page);
   const markup = imagesTemplate(data.hits);
   gallery.insertAdjacentHTML("beforeend", markup);
+  if (!lightboxInstance) {
+        initLightbox();
+    } else {
+        refreshLightbox();
+    }
   return data;
 }
 

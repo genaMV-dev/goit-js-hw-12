@@ -1,6 +1,6 @@
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
-import { createGallery, clearGallery, hideLoader, showLoader, hideLoadMoreBtn, showLoadMoreBtn, refreshLightbox, addImagesToGallery } from "./js/render-functions";
+import { createGallery, clearGallery, hideLoader, showLoader, hideLoadMoreBtn, showLoadMoreBtn, imagesTemplate, refreshLightbox } from "./js/render-functions";
 import { getImagesByQuery} from "./js/pixabay-api";
 
 const form = document.querySelector(".form");
@@ -14,7 +14,7 @@ function scrollPage() {
   const el = gallery.lastElementChild;
   const height = el.getBoundingClientRect().height;
   window.scrollBy({
-    top: height * 2.4,
+    top: height * 2,
     behavior: "smooth",
   });
 }
@@ -79,7 +79,9 @@ loadMoreBtn.addEventListener("click", async (e) => {
     page++;
     hideLoadMoreBtn();
     try {
-        const data = await addImagesToGallery(query, page);
+        const data = await getImagesByQuery(query, page);
+        const markup = imagesTemplate(data.hits);
+        gallery.insertAdjacentHTML("beforeend", markup);
         scrollPage();
         refreshLightbox();
 
@@ -89,6 +91,8 @@ loadMoreBtn.addEventListener("click", async (e) => {
                 message: "We're sorry, but you've reached the end of search results.",
                 color: "blue",
             });
+        } else {
+            showLoadMoreBtn();
         }
     } catch (err) {
         iziToast.show({
@@ -96,10 +100,10 @@ loadMoreBtn.addEventListener("click", async (e) => {
             message: "Something went wrong while loading more images. Please try again.",
             color: "red",
         });
+        showLoadMoreBtn();
     } finally {
         hideLoader(gallery);
     }
-    showLoadMoreBtn();
 });
     
     
