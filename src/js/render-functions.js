@@ -2,7 +2,6 @@
 import SimpleLightbox from "simplelightbox";
 // Додатковий імпорт стилів
 import "simplelightbox/dist/simple-lightbox.min.css";
-import { getImagesByQuery } from "./pixabay-api";
 
 const loadMoreBtn = document.querySelector(".load-more-btn");
 const gallery = document.querySelector(".gallery");
@@ -73,16 +72,19 @@ export function createGallery(images){
     }
 }
 
-export async function addImagesToGallery(query, page) {
-  const data = await getImagesByQuery(query, page);
-  const markup = imagesTemplate(data.hits);
+export function appendImagesToGallery(images) {
+  const markup = imagesTemplate(images);
   gallery.insertAdjacentHTML("beforeend", markup);
-  if (!lightboxInstance) {
-        initLightbox();
-    } else {
-        refreshLightbox();
-    }
-  return data;
+  refreshLightbox();
+}
+
+export function scrollPage() {
+  const el = gallery.lastElementChild;
+  const height = el.getBoundingClientRect().height;
+  window.scrollBy({
+    top: height * 2,
+    behavior: "smooth",
+  });
 }
 
 export function clearGallery(gallery) {

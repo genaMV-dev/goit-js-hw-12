@@ -1,6 +1,6 @@
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
-import { createGallery, clearGallery, hideLoader, showLoader, hideLoadMoreBtn, showLoadMoreBtn, imagesTemplate, refreshLightbox } from "./js/render-functions";
+import { createGallery, clearGallery, hideLoader, showLoader, hideLoadMoreBtn, showLoadMoreBtn, imagesTemplate, refreshLightbox, appendImagesToGallery, scrollPage } from "./js/render-functions";
 import { getImagesByQuery} from "./js/pixabay-api";
 
 const form = document.querySelector(".form");
@@ -9,15 +9,6 @@ const loadMoreBtn = document.querySelector(".load-more-btn");
 
 let query;
 let page = 1;
-
-function scrollPage() {
-  const el = gallery.lastElementChild;
-  const height = el.getBoundingClientRect().height;
-  window.scrollBy({
-    top: height * 2,
-    behavior: "smooth",
-  });
-}
 
 async function handleSearch(query) {
   try {
@@ -80,10 +71,8 @@ loadMoreBtn.addEventListener("click", async (e) => {
     hideLoadMoreBtn();
     try {
         const data = await getImagesByQuery(query, page);
-        const markup = imagesTemplate(data.hits);
-        gallery.insertAdjacentHTML("beforeend", markup);
+        appendImagesToGallery(data.hits);
         scrollPage();
-        refreshLightbox();
 
         if (page * 15 >= data.totalHits) {
             hideLoadMoreBtn();
